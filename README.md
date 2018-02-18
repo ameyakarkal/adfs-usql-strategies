@@ -7,4 +7,4 @@ These are few strategies of moving data from a transactional database table into
 - table in the transactional database that needs to be moved.
 
 #### `Slice`
-- a unit of data of the `Entity` that is moved by your "copy" process. 
+- a unit of data of the `Entity` that is moved in a iteration of "copy" process. 
