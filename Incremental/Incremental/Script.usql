@@ -1,0 +1,5 @@
+﻿/**
+    /data/raw/slice.csv         : current incremental slice delivered by data factory
+    /data/curated/data.csv      : current version of data available for consumption
+
+**/
