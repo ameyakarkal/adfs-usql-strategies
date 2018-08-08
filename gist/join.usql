@@ -1,0 +1,67 @@
+/**
+currently performing a JOIN between two entities cannot be done with a OR operation.
+this can however be achieved using the following structure
+**/
+
+@user = 
+SELECT *
+FROM
+(
+    VALUES
+        (1, "a", "a@gmail.com"),
+        (2, "b", "b@gmail.com")
+) AS T(Id, ExternalId, Email);
+
+
+@response =
+SELECT * 
+FROM
+(
+    VALUES
+    (100, "a", 1000),
+    (101, "a@gmail.com", 2000),
+    (102, "c", 3000)
+
+) AS T(Id, ExternalId, Response);
+
+@matchOnExternalId =
+SELECT 
+r.*,
+(int?) u.Id AS UserId
+FROM 
+@response AS r
+INNER JOIN  @user AS u  ON u.ExternalId == r.ExternalId;
+
+@matchOnEmail =
+SELECT 
+r.*,
+(int?) u.Id AS UserId
+FROM 
+@response AS r
+INNER JOIN  @user AS u ON u.Email == r.ExternalId
+LEFT JOIN @matchOnExternalId AS matched ON matched.Id == r.Id
+WHERE matched.Id IS NULL;
+
+@noMatch = 
+SELECT 
+r.*,
+(int?) null AS UserId
+FROM
+@response AS r
+LEFT OUTER JOIN @matchOnExternalId AS ex ON ex.Id == r.Id
+LEFT OUTER JOIN @matchOnEmail AS email ON email.Id == r.Id
+WHERE ex.Id IS NULL AND email.Id IS NULL;
+
+
+
+@result =
+SELECT * FROM @matchOnExternalId
+UNION ALL
+SELECT * FROM @matchOnEmail
+UNION ALL
+SELECT * FROM @noMatch;
+
+
+OUTPUT @result
+TO "user.csv"
+USING Outputters.Csv();
